@@ -15,7 +15,7 @@ response = openai.ChatCompletion.create(
 tokens_used = response['usage']['total_tokens']
 cost = tokens_used * 0.000005  # GPT-4o input+output = $0.005 per 1K tokens
 
-print(f"🔢 Tokens used: {tokens_used}")
-print(f"💵 Estimated cost: ${cost:.6f}")
-print("🧠 GPT Response:")
+print(f"Tokens used: {tokens_used}")
+print(f"Estimated cost: ${cost:.6f}")
+print("GPT Response:")
 print(response['choices'][0]['message']['content'])

@@ -34,7 +34,7 @@ step3 = openai.ChatCompletion.create(
 )
 summary = step2.choices[0].message.content.strip()
 tweet = step3.choices[0].message.content.strip()
-print("\n✅ Final Summary:")
+print("\nFinal Summary:")
 print(summary)
 print("\nTweet: ")
 print(tweet)

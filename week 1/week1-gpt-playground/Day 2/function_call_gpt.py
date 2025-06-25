@@ -38,5 +38,5 @@ response = openai.ChatCompletion.create(
     function_call="auto"
 )
 
-print("\n🧠 Function Call Output:\n")
+print("\nFunction Call Output:\n")
 print(response['choices'][0]['message']['function_call'])

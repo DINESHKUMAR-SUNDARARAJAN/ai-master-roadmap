@@ -8,7 +8,7 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 
 # Take prompt from command line
 if len(sys.argv) < 2:
-    print("❌ Please provide a prompt as a command-line argument.")
+    print("Please provide a prompt as a command-line argument.")
     sys.exit(1)
 
 system_role = sys.argv[1]
@@ -22,7 +22,7 @@ response = openai.ChatCompletion.create(
     ]
 )
 
-print("\n🧠 GPT-4o Response:\n")
+print("\nGPT-4o Response:\n")
 print(response['choices'][0]['message']['content'])
 print("Token usage: "+str(response['usage']['total_tokens']))
 print(response)

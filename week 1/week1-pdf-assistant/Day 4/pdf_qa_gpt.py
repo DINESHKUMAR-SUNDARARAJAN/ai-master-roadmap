@@ -20,5 +20,5 @@ response = openai.ChatCompletion.create(
     ]
 )
 
-print("📄 GPT-4o Answer:")
+print("GPT-4o Answer:")
 print(response['choices'][0]['message']['content'])

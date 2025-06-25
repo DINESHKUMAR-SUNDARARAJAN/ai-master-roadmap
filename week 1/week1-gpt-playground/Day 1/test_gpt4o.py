@@ -12,7 +12,7 @@ if not openai.api_key:
 user_prompt = sys.argv[1]
 
 if len(sys.argv) < 2:
-    print("❌ Please provide a prompt as a command-line argument.")
+    print("Please provide a prompt as a command-line argument.")
     sys.exit(1)
 
 response = openai.ChatCompletion.create(
@@ -23,7 +23,7 @@ response = openai.ChatCompletion.create(
     ]
 )
 
-print("\n🧠 GPT-4o Response:\n")
+print("\nGPT-4o Response:\n")
 print(response['choices'][0]['message']['content'])
 print("Token usage: "+str(response['usage']['total_tokens']))
 print(response)
