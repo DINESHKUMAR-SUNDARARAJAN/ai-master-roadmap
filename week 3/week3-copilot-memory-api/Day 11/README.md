@@ -1,42 +1,31 @@
-# 📚 Week 3 – Day 2: User-Specific GPT Agent with File Uploads & Memory
+# Week 3 – Day 11: LangGraph Multi-Tool Agent with Sequential Reasoning
 
 ## Objective
-Build a personalized AI assistant that:
-- Accepts user-specific file uploads (PDFs)
-- Stores those documents in per-user vector databases
-- Lets GPT answer queries using tool calling + LangGraph
-- Tracks chat memory per user
-- Exposes everything via FastAPI `/chat` and `/upload/{user_id}`
+Enhance your GPT-4o agent to intelligently chain together multiple tool calls in response to a single query — just like a human would break down a problem and take actions step by step.
 
 ---
 
-## Features Built
+## Features Added
 
-### File Uploads
-- POST `/upload/{user_id}`
-- Accepts PDF files
-- Stores in `uploads/{user_id}/filename.pdf`
-- Chunks + indexes using `Chroma.from_documents(..., persist_directory=db/{user_id})`
+### Sequential Tool Execution
+- Agent can now call multiple tools in one response loop
+- GPT → tool → GPT → tool → final answer
 
-### Tools
-- `tool_search_user_docs(query: str, user_id: str)` — uses `StructuredTool`
+### Router Logic
+- Dynamically checks if GPT wants to call another function
+- Loops until no more tool calls requested
 
-### LangGraph Agent Flow
-- Tracks `messages` and `user_id` using `AgentState`
-- Loops: GPT → Function Call → Execution → GPT again → Final response
-- Built using `llm_node`, `exec_node`, `router`, and `finish_node`
+## Files Updated
 
-### Memory Store
-- Per-user chat memory
-- Retrieved before agent execution
-- Updated with every new message or tool result
+- `agent_graph.py` — supports multiple tool calls
+- `build_tools.py` — verified tool names and structure
+- `memory_store.py` — stores per-user messages
+- `run_agent()` — now handles complex flow transparently
 
----
+## Test Cases
 
-## API Endpoints
-
-### Upload PDF
-```http
-POST /upload/dinesh
-Body: form-data
-File: engineering_handbook.pdf
+| Prompt | Expected Behavior |
+|--------|-------------------|
+| "What is our onboarding process and what year is it?" | 2 tool calls → single GPT summary |
+| "Give me the current year" | Calls only year tool |
+| "What does our handbook say about deployment?" | Only search_docs tool |
