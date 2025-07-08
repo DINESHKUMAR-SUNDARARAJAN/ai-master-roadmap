@@ -11,11 +11,11 @@ def test_chat(user_id: str, query: str):
     print("Response:", response.json()["response"])
 
 
-def test_upload(user_id: str, file_path: str):
+'''def test_upload(user_id: str, file_path: str):
     print(f"Uploading file: {file_path} for user: {user_id}")
     with open(file_path, "rb") as f:
         response = requests.post(f"{BASE_URL}/upload/" + user_id, files={"file": f})
-    print("Upload Response:", response.json())
+    print("Upload Response:", response.json())'''
 
 
 if __name__ == "__main__":
@@ -24,10 +24,10 @@ if __name__ == "__main__":
     pdf_path = "engineering_handbook.pdf"
 
     # 1. Upload a PDF
-    test_upload(user, pdf_path)
+    # test_upload(user, pdf_path)
 
     # 2. Ask a question about the uploaded document
-    test_chat(user, "What is our onboarding process?")
+    # test_chat(user, "What is our onboarding process?")
 
     # 3. Ask a follow-up question to check memory + RAG
-    test_chat(user, "Can you summarize our deployment flow again?")
+    test_chat(user, "What is our deployment policy and what year is it?")
