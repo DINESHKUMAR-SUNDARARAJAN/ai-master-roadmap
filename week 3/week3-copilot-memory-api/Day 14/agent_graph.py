@@ -128,6 +128,6 @@ def run_agent_stream(user_id: str, query: str):
         for node_output in step.values():
             message = node_output.get("messages", [])[-1]
             print(message.content)
-            yield message.content + "-"*50
+            yield message.content + "\n\n"
                     
 

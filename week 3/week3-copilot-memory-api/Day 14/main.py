@@ -28,10 +28,17 @@ async def chat(request: ChatRequest):
     response = run_agent(request.user_id, request.query)
     return {"response": response}
 
-@app.post("/chat/stream")
+"""@app.post("/chat/stream")
 async def stream_chat(req: ChatRequest):
     response = StreamingResponse(
         run_agent_stream(req.user_id, req.query),
         media_type="text/event-stream"
     )
-    return  response
+    return  response"""
+
+@app.post("/chat/stream")
+async def stream_chat(req: ChatRequest):
+    def event_stream():
+        for chunk in run_agent_stream(req.user_id, req.query):
+            yield chunk + "\n"
+    return StreamingResponse(event_stream(), media_type="text/plain")
