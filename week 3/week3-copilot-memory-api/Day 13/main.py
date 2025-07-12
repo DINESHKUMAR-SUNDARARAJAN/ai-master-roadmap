@@ -1,8 +1,9 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
-from agent_graph import run_agent
+from agent_graph import run_agent, run_agent_stream
 from file_upload import router as upload_router
+from fastapi.responses import StreamingResponse
 
 # Create app BEFORE including routers
 app = FastAPI()
@@ -26,3 +27,11 @@ class ChatRequest(BaseModel):
 async def chat(request: ChatRequest):
     response = run_agent(request.user_id, request.query)
     return {"response": response}
+
+@app.post("/chat/stream")
+async def stream_chat(req: ChatRequest):
+    response = StreamingResponse(
+        run_agent_stream(req.user_id, req.query),
+        media_type="text/event-stream"
+    )
+    return  response

@@ -75,6 +75,8 @@ def router(state: AgentState) -> str:
 def finish_node(state: AgentState) -> AgentState:
     print("\nFINISH_NODE")
     final_reply = llm.invoke(state.messages)
+    print("\n\nFinal: " + str(final_reply)+"\n\n")
+    print(AgentState(messages=state.messages + [final_reply], user_id=state.user_id))
     return AgentState(messages=state.messages + [final_reply], user_id=state.user_id)
 
 
@@ -113,3 +115,19 @@ def run_agent(user_id: str, query: str) -> str:
         None
     )
     return ai_response or "I wasn't able to generate a response."
+
+def run_agent_stream(user_id: str, query: str):
+    memory = get_memory(user_id)
+    input_msg = HumanMessage(content=query)
+    add_to_memory(user_id, input_msg)
+
+    state = AgentState(messages=memory + [input_msg], user_id=user_id)
+
+    print("\nStreaming LangGraph output:")
+    for step in runnable.stream(state):
+        for node_output in step.values():
+            message = node_output.get("messages", [])[-1]
+            print(message.content)
+            yield message.content + "-"*50
+                    
+
