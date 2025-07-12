@@ -30,4 +30,4 @@ if __name__ == "__main__":
     # test_chat(user, "What is our onboarding process?")
 
     # 3. Ask a follow-up question to check memory + RAG
-    test_chat(user, "What is our deployment policy and what year is it?")
+    test_chat(user, "What is our onboarding policy and background check policy and what is 12 divided by 4.5? and also todays date in milan")
