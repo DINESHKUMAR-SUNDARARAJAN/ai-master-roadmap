@@ -3,12 +3,19 @@ import requests
 BASE_URL = "http://localhost:8000"
 
 def test_chat(user_id: str, query: str):
-    print(f"Chat: {query}")
-    response = requests.post(f"{BASE_URL}/chat", json={
-        "user_id": user_id,
-        "query": query
-    })
-    print("Response:", response.json()["response"])
+    print(f"Query: {query}")
+    response = requests.post(
+        f"{BASE_URL}/chat/stream",
+        json={"user_id": user_id, "query": query},
+        stream=True
+    )
+
+    print("Streamed response:")
+    for line in response.iter_lines():
+        if line:
+            print(line.decode("utf-8"), end="", flush=True)
+    print("\nDone")
+
 
 
 '''def test_upload(user_id: str, file_path: str):
