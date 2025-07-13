@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head><title>Chat Stream</title></head>
+<body>
+  <h2>GPT Agent Chat</h2>
+  <textarea id="query" rows="4" cols="50"></textarea><br/>
+  <button onclick="send()">Send</button>
+  <pre id="response"></pre>
+
+<script>
+function send() {
+    const query = document.getElementById("query").value;
+    const userId = "dinesh";
+    const resEl = document.getElementById("response");
+    resEl.textContent = "";
+
+    fetch("http://localhost:8000/chat/stream", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user_id: userId, query: query })
+    })
+    .then(response => {
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        function readChunk() {
+            reader.read().then(({ done, value }) => {
+                if (done) return;
+                resEl.textContent += decoder.decode(value, { stream: true });
+                readChunk();
+            });
+        }
+        readChunk();
+    });
+}
+</script>
+</body>
+</html>
