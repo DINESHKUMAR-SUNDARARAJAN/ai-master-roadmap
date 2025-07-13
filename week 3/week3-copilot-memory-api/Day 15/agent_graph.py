@@ -1,12 +1,13 @@
 from langchain_openai import ChatOpenAI
 from langgraph.graph import StateGraph
 from langchain_core.runnables import RunnableLambda
-from langchain_core.messages import HumanMessage, AIMessage, BaseMessage, FunctionMessage
+from langchain_core.messages import HumanMessage, AIMessage, BaseMessage, FunctionMessage, SystemMessage
 from pydantic import BaseModel
 from typing import List
 from dotenv import load_dotenv
-from memory_store import get_memory, add_to_memory
+from memory_store import get_memory, add_to_memory, get_summary, set_summary
 from build_tools import TOOLS, OPENAI_FUNCTION_SCHEMAS
+from utilities.summerize_memory import summarize_memory
 import json
 
 load_dotenv()
@@ -19,6 +20,17 @@ class AgentState(BaseModel):
 
 # 2. LLM node
 llm = ChatOpenAI(model="gpt-4o")
+
+SYSTEM_PROMPT = """
+You are Jarvis, a smart, friendly, and helpful AI assistant trained on Dinesh's engineering documents.
+You must:
+- Speak concisely
+- Maintain a polite, expert tone
+- Use markdown for clarity
+- Say “I” when speaking, like a human
+- Never reveal you are an LLM or model
+"""
+
 
 def llm_node(state: AgentState) -> AgentState:
     print(f"\nLLM_NODE for '{state.user_id}': {[m.content for m in state.messages]}")
@@ -49,7 +61,13 @@ def func_exec_node(state: AgentState) -> AgentState:
 
     for tool in TOOLS:
         if tool.name == name:
-            result = tool.invoke(args)
+            try:
+                result = tool.invoke(args)
+                print("Result: " + str(result) + "----"*50)
+            except Exception as e:
+                result_str = f"Tool '{name}' failed: {str(e)}"
+            else:
+                result_str = json.dumps(result) if not isinstance(result, str) else result
             try:
                 result_str = result if isinstance(result, str) else json.dumps(result)
             except Exception:
@@ -99,6 +117,7 @@ runnable = graph.compile()
 
 # 7. Agent entry
 def run_agent(user_id: str, query: str) -> str:
+    
     memory = get_memory(user_id)
     input_msg = HumanMessage(content=query)
     add_to_memory(user_id, input_msg)
@@ -117,11 +136,17 @@ def run_agent(user_id: str, query: str) -> str:
     return ai_response or "I wasn't able to generate a response."
 
 def run_agent_stream(user_id: str, query: str):
+    MAX_MEMORY_LENGTH = 5
     memory = get_memory(user_id)
+    if len(memory) > MAX_MEMORY_LENGTH:
+        summary = summarize_memory(memory)
+        set_summary(user_id, summary)
+        memory = [summary] 
     input_msg = HumanMessage(content=query)
+    system_msg = SystemMessage(content=SYSTEM_PROMPT)
     add_to_memory(user_id, input_msg)
 
-    state = AgentState(messages=memory + [input_msg], user_id=user_id)
+    state = AgentState(messages=[system_msg] + memory + [input_msg], user_id=user_id)
 
     print("\nStreaming LangGraph output:")
     for step in runnable.stream(state):

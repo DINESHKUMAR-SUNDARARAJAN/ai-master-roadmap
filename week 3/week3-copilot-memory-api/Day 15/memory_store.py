@@ -1,11 +1,14 @@
-# memory_store.py
-from collections import defaultdict
+USER_MEMORY = {}
+USER_SUMMARY = {}
 
-# In-memory dict to store per-user memory
-USER_MEMORY = defaultdict(list)
+def get_memory(user_id):
+    return USER_MEMORY.get(user_id, [])
 
-def get_memory(user_id: str) -> list:
-    return USER_MEMORY[user_id]
+def add_to_memory(user_id, msg):
+    USER_MEMORY.setdefault(user_id, []).append(msg)
 
-def add_to_memory(user_id: str, message) -> None:
-    USER_MEMORY[user_id].append(message)
+def get_summary(user_id):
+    return USER_SUMMARY.get(user_id, None)
+
+def set_summary(user_id, summary_msg):
+    USER_SUMMARY[user_id] = summary_msg
